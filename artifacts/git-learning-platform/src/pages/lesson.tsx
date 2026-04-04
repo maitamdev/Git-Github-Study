@@ -1,5 +1,6 @@
 import Layout from "@/components/layout";
-import { useGetLesson, useGetCourse, useCompleteLesson, useValidateChallenge, useExecuteGitCommand, RepoState } from "@workspace/api-client-react";
+import { useGetLesson, useGetCourse, useCompleteLesson, useValidateChallenge, useExecuteGitCommand, getGetLessonQueryKey, getGetCourseQueryKey } from "@workspace/api-client-react";
+import type { RepoState } from "@workspace/api-client-react";
 import { useParams, useLocation, Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -18,8 +19,8 @@ export default function Lesson() {
   const lessonId = params.lessonId;
   const [, setLocation] = useLocation();
 
-  const { data: lesson, isLoading: isLessonLoading } = useGetLesson(lessonId!, { query: { enabled: !!lessonId } });
-  const { data: course, isLoading: isCourseLoading } = useGetCourse(lesson?.moduleId ? lesson.moduleId : "", { query: { enabled: false } });
+  const { data: lesson, isLoading: isLessonLoading } = useGetLesson(lessonId!, { query: { queryKey: getGetLessonQueryKey(lessonId!), enabled: !!lessonId } });
+  const { data: course, isLoading: isCourseLoading } = useGetCourse(lesson?.moduleId ? lesson.moduleId : "", { query: { queryKey: getGetCourseQueryKey(""), enabled: false } });
   
   const executeGitCommand = useExecuteGitCommand();
   const validateChallenge = useValidateChallenge();
@@ -119,7 +120,7 @@ export default function Lesson() {
               
               {lesson.videoUrl && (
                 <div className="aspect-video bg-black rounded-lg overflow-hidden border border-border shadow-sm">
-                  <ReactPlayer url={lesson.videoUrl} width="100%" height="100%" controls />
+                  <ReactPlayer url={lesson.videoUrl as string} width="100%" height="100%" controls />
                 </div>
               )}
 

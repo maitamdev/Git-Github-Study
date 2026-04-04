@@ -1,5 +1,5 @@
 import Layout from "@/components/layout";
-import { useGetCourse } from "@workspace/api-client-react";
+import { useGetCourse, getGetCourseQueryKey } from "@workspace/api-client-react";
 import { useParams } from "wouter";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function Course() {
   const params = useParams();
   const courseId = params.courseId;
-  const { data: course, isLoading } = useGetCourse(courseId!, { query: { enabled: !!courseId } });
+  const { data: course, isLoading } = useGetCourse(courseId!, { query: { queryKey: getGetCourseQueryKey(courseId!), enabled: !!courseId } });
 
   if (isLoading) {
     return (
