@@ -8,6 +8,12 @@ import { Link } from "wouter";
 import { BookOpen, Trophy, Clock } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
+const levelMap: Record<string, string> = {
+  beginner: "Cơ bản",
+  intermediate: "Trung cấp",
+  advanced: "Nâng cao",
+};
+
 export default function Home() {
   const { data: courses, isLoading: isLoadingCourses } = useListCourses();
   const { data: progress, isLoading: isLoadingProgress } = useGetProgress();
@@ -16,17 +22,17 @@ export default function Home() {
     <Layout>
       <div className="max-w-5xl mx-auto w-full p-8 space-y-8">
         <div className="flex flex-col space-y-2">
-          <h1 className="text-4xl font-extrabold tracking-tight">Your Learning Path</h1>
-          <p className="text-muted-foreground text-lg">Master Git from basic commands to advanced workflows.</p>
+          <h1 className="text-4xl font-extrabold tracking-tight">Lộ Trình Học Tập</h1>
+          <p className="text-muted-foreground text-lg">Chinh phục Git từ lệnh cơ bản đến quy trình nâng cao.</p>
         </div>
 
         {progress && (
           <div className="bg-secondary/50 rounded-lg p-6 border border-border flex items-center justify-between">
             <div className="space-y-1">
-              <h2 className="text-xl font-semibold">Overall Progress</h2>
+              <h2 className="text-xl font-semibold">Tiến Độ Tổng Thể</h2>
               <div className="text-sm text-muted-foreground flex items-center gap-2">
                 <Trophy className="h-4 w-4 text-primary" />
-                {progress.completedLessons} of {progress.totalLessons} lessons completed
+                Đã hoàn thành {progress.completedLessons}/{progress.totalLessons} bài học
               </div>
             </div>
             <div className="w-1/3 flex items-center gap-4">
@@ -60,10 +66,10 @@ export default function Home() {
                       course.level === 'beginner' ? 'default' :
                       course.level === 'intermediate' ? 'secondary' : 'destructive'
                     }>
-                      {course.level}
+                      {levelMap[course.level] || course.level}
                     </Badge>
                     {course.progressPercent === 100 && (
-                      <Badge variant="outline" className="text-green-500 border-green-500/20 bg-green-500/10">Completed</Badge>
+                      <Badge variant="outline" className="text-green-500 border-green-500/20 bg-green-500/10">Hoàn thành</Badge>
                     )}
                   </div>
                   <CardTitle className="text-xl">{course.title}</CardTitle>
@@ -74,17 +80,17 @@ export default function Home() {
                     <div className="flex items-center text-sm text-muted-foreground gap-4">
                       <div className="flex items-center gap-1">
                         <BookOpen className="h-4 w-4" />
-                        <span>{course.totalLessons} Lessons</span>
+                        <span>{course.totalLessons} bài học</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-4 w-4" />
-                        <span>Self-paced</span>
+                        <span>Tự theo tiến độ</span>
                       </div>
                     </div>
                     {(course.progressPercent ?? 0) > 0 && (
                       <div className="space-y-1">
                         <div className="flex justify-between text-xs mb-1">
-                          <span className="text-muted-foreground">Progress</span>
+                          <span className="text-muted-foreground">Tiến độ</span>
                           <span className="font-medium">{Math.round(course.progressPercent ?? 0)}%</span>
                         </div>
                         <Progress value={course.progressPercent} className="h-2" />
@@ -95,7 +101,7 @@ export default function Home() {
                 <CardFooter>
                   <Link href={`/course/${course.id}`} className="w-full">
                     <Button className="w-full" variant={(course.progressPercent ?? 0) > 0 ? "secondary" : "default"}>
-                      {(course.progressPercent ?? 0) > 0 ? "Continue Course" : "Start Course"}
+                      {(course.progressPercent ?? 0) > 0 ? "Tiếp tục học" : "Bắt đầu học"}
                     </Button>
                   </Link>
                 </CardFooter>

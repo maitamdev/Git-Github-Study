@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        <p className="text-muted-foreground text-sm">Loading...</p>
+        <p className="text-muted-foreground text-sm">Đang tải...</p>
       </div>
     </div>
   );
@@ -40,7 +40,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6 shrink-0 z-10">
         <Link href="/" className="flex items-center gap-2 text-primary font-bold text-xl">
           <GitBranch className="h-6 w-6" />
-          <span>GitPlatform</span>
+          <span>Học Git</span>
         </Link>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium bg-secondary py-1 px-3 rounded-full">
@@ -49,7 +49,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
           <Button variant="ghost" size="sm" onClick={handleLogout} className="text-muted-foreground hover:text-foreground">
             <LogOut className="h-4 w-4 mr-2" />
-            Logout
+            Đăng xuất
           </Button>
         </div>
       </header>

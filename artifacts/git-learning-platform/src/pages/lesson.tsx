@@ -19,9 +19,8 @@ export default function Lesson() {
   const [, setLocation] = useLocation();
 
   const { data: lesson, isLoading: isLessonLoading } = useGetLesson(lessonId!, { query: { enabled: !!lessonId } });
-  const { data: course, isLoading: isCourseLoading } = useGetCourse(lesson?.moduleId ? lesson.moduleId : "", { query: { enabled: false } }); // Wait, course is needed for sidebar, but let's just fetch it using courseId if available. The lesson has moduleId. We might need a separate endpoint to get course by module or just get the course list and find it.
+  const { data: course, isLoading: isCourseLoading } = useGetCourse(lesson?.moduleId ? lesson.moduleId : "", { query: { enabled: false } });
   
-  // Let's simplify and just focus on the lesson content and terminal first.
   const executeGitCommand = useExecuteGitCommand();
   const validateChallenge = useValidateChallenge();
   const completeLessonMutation = useCompleteLesson();
@@ -50,9 +49,9 @@ export default function Lesson() {
       if (res.newState) {
         setRepoState(res.newState);
       }
-      return res.output + (res.error ? `\nError: ${res.error}` : "");
+      return res.output + (res.error ? `\nLỗi: ${res.error}` : "");
     } catch (e: any) {
-      return `Error: ${e.message || 'Unknown error'}`;
+      return `Lỗi: ${e.message || 'Không xác định'}`;
     }
   };
 
@@ -61,13 +60,13 @@ export default function Lesson() {
     validateChallenge.mutate({ data: { challengeId: lesson.challenge.id, state: repoState } }, {
       onSuccess: (res) => {
         if (res.success) {
-          toast.success("Challenge passed!");
+          toast.success("🎉 Bài tập hoàn thành! Xuất sắc!");
         } else {
-          toast.error(res.message);
+          toast.error(res.message || "Chưa đúng, thử lại nhé!");
         }
       },
       onError: () => {
-        toast.error("Failed to validate challenge");
+        toast.error("Không thể kiểm tra bài tập");
       }
     });
   };
@@ -75,7 +74,7 @@ export default function Lesson() {
   const handleComplete = () => {
     completeLessonMutation.mutate({ lessonId: lesson!.id }, {
       onSuccess: () => {
-        toast.success("Lesson completed!");
+        toast.success("✅ Hoàn thành bài học!");
         if (lesson?.nextLessonId) {
           setLocation(`/lesson/${lesson.nextLessonId}`);
         } else {
@@ -96,7 +95,7 @@ export default function Lesson() {
   return (
     <Layout>
       <div className="flex flex-col h-full bg-background overflow-hidden">
-        {/* Top Header / Progress */}
+        {/* Header */}
         <header className="h-14 border-b border-border bg-card flex items-center justify-between px-4 shrink-0">
           <div className="flex items-center gap-4">
             <h1 className="font-semibold text-lg">{lesson.title}</h1>
@@ -104,11 +103,11 @@ export default function Lesson() {
           <div className="flex items-center gap-2">
             {lesson.challenge && (
               <Button variant="outline" size="sm" onClick={handleCheckSolution} disabled={validateChallenge.isPending}>
-                Check Solution
+                Kiểm tra
               </Button>
             )}
             <Button size="sm" onClick={handleComplete} disabled={completeLessonMutation.isPending} className="bg-primary text-primary-foreground">
-              Complete & Continue <ChevronRight className="w-4 h-4 ml-1" />
+              Hoàn thành & Tiếp tục <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           </div>
         </header>
@@ -165,7 +164,7 @@ export default function Lesson() {
                 <div className="w-1/2 flex flex-col">
                   <div className="h-10 border-b border-border flex items-center px-4 bg-muted/30">
                     <GitIcon className="w-4 h-4 mr-2" />
-                    <span className="text-sm font-medium">Git Graph</span>
+                    <span className="text-sm font-medium">Sơ đồ Git</span>
                   </div>
                   <div className="flex-1 relative">
                     <GitGraph repoState={repoState} />

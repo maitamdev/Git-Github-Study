@@ -1,7 +1,6 @@
 import Layout from "@/components/layout";
 import { useGetCourse } from "@workspace/api-client-react";
 import { useParams } from "wouter";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
 import { Link } from "wouter";
@@ -33,7 +32,7 @@ export default function Course() {
     return (
       <Layout>
         <div className="max-w-5xl mx-auto w-full p-8 text-center">
-          <h1 className="text-2xl font-bold">Course not found</h1>
+          <h1 className="text-2xl font-bold">Không tìm thấy khóa học</h1>
         </div>
       </Layout>
     );
@@ -49,7 +48,7 @@ export default function Course() {
           <div className="flex items-center gap-4 max-w-md pt-4">
             <div className="flex-1">
               <div className="flex justify-between text-sm mb-2">
-                <span className="font-medium">Course Progress</span>
+                <span className="font-medium">Tiến độ khóa học</span>
                 <span className="text-muted-foreground">{Math.round(course.progressPercent ?? 0)}%</span>
               </div>
               <Progress value={course.progressPercent} className="h-3" />
@@ -58,13 +57,13 @@ export default function Course() {
         </div>
 
         <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-6">Course Content</h2>
+          <h2 className="text-2xl font-bold mb-6">Nội Dung Khóa Học</h2>
           <Accordion type="multiple" defaultValue={course.modules.map(m => m.id)} className="space-y-4">
             {course.modules.map((module) => (
               <AccordionItem key={module.id} value={module.id} className="bg-card border border-border rounded-lg overflow-hidden">
                 <AccordionTrigger className="px-6 py-4 hover:no-underline hover:bg-secondary/50 transition-colors">
                   <div className="flex flex-col items-start text-left">
-                    <div className="text-sm text-muted-foreground mb-1 font-normal">Module {module.order}</div>
+                    <div className="text-sm text-muted-foreground mb-1 font-normal">Chương {module.order}</div>
                     <div className="text-lg font-semibold">{module.title}</div>
                   </div>
                 </AccordionTrigger>
@@ -90,7 +89,7 @@ export default function Course() {
                               )}
                               {lesson.hasPractice && (
                                 <span className="flex items-center gap-1">
-                                  Terminal Practice
+                                  Bài thực hành Terminal
                                 </span>
                               )}
                             </div>

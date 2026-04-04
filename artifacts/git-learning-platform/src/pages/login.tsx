@@ -12,8 +12,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
+  email: z.string().email("Email không hợp lệ"),
+  password: z.string().min(1, "Vui lòng nhập mật khẩu"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -42,8 +42,8 @@ export default function Login() {
         },
         onError: (error) => {
           toast({
-            title: "Login failed",
-            description: (error as any)?.error || "Invalid email or password",
+            title: "Đăng nhập thất bại",
+            description: "Email hoặc mật khẩu không đúng",
             variant: "destructive",
           });
         }
@@ -58,8 +58,8 @@ export default function Login() {
           <div className="h-12 w-12 bg-primary/10 text-primary flex items-center justify-center rounded-xl mb-4">
             <GitBranch className="h-6 w-6" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Welcome back</h1>
-          <p className="text-muted-foreground text-sm">Log in to continue your learning journey.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Chào mừng trở lại</h1>
+          <p className="text-muted-foreground text-sm">Đăng nhập để tiếp tục hành trình học tập.</p>
         </div>
 
         <div className="bg-card border border-border p-8 rounded-xl shadow-sm">
@@ -72,7 +72,7 @@ export default function Login() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="you@example.com" type="email" {...field} />
+                      <Input placeholder="email@example.com" type="email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -83,7 +83,7 @@ export default function Login() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Mật khẩu</FormLabel>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
@@ -92,15 +92,15 @@ export default function Login() {
                 )}
               />
               <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
-                {loginMutation.isPending ? "Logging in..." : "Log In"}
+                {loginMutation.isPending ? "Đang đăng nhập..." : "Đăng Nhập"}
               </Button>
             </form>
           </Form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
+            Chưa có tài khoản?{" "}
             <Link href="/register" className="text-primary hover:underline font-medium">
-              Sign up
+              Đăng ký
             </Link>
           </div>
         </div>

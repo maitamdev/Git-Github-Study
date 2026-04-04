@@ -12,9 +12,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 
 const registerSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  name: z.string().min(2, "Tên phải có ít nhất 2 ký tự"),
+  email: z.string().email("Email không hợp lệ"),
+  password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
 });
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
@@ -43,9 +43,10 @@ export default function Register() {
           setLocation("/");
         },
         onError: (error) => {
+          const message = (error as any)?.error;
           toast({
-            title: "Registration failed",
-            description: error.error || "An error occurred",
+            title: "Đăng ký thất bại",
+            description: message === "Email already in use" ? "Email này đã được sử dụng" : (message || "Đã xảy ra lỗi"),
             variant: "destructive",
           });
         }
@@ -60,8 +61,8 @@ export default function Register() {
           <div className="h-12 w-12 bg-primary/10 text-primary flex items-center justify-center rounded-xl mb-4">
             <GitBranch className="h-6 w-6" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">Create an account</h1>
-          <p className="text-muted-foreground text-sm">Join the platform and master Git.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Tạo tài khoản</h1>
+          <p className="text-muted-foreground text-sm">Tham gia nền tảng và chinh phục Git.</p>
         </div>
 
         <div className="bg-card border border-border p-8 rounded-xl shadow-sm">
@@ -72,9 +73,9 @@ export default function Register() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel>Họ và tên</FormLabel>
                     <FormControl>
-                      <Input placeholder="John Doe" {...field} />
+                      <Input placeholder="Nguyễn Văn A" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -87,7 +88,7 @@ export default function Register() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="you@example.com" type="email" {...field} />
+                      <Input placeholder="email@example.com" type="email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -98,7 +99,7 @@ export default function Register() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Password</FormLabel>
+                    <FormLabel>Mật khẩu</FormLabel>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" {...field} />
                     </FormControl>
@@ -107,15 +108,15 @@ export default function Register() {
                 )}
               />
               <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
-                {registerMutation.isPending ? "Creating account..." : "Sign Up"}
+                {registerMutation.isPending ? "Đang tạo tài khoản..." : "Đăng Ký"}
               </Button>
             </form>
           </Form>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
+            Đã có tài khoản?{" "}
             <Link href="/login" className="text-primary hover:underline font-medium">
-              Log in
+              Đăng nhập
             </Link>
           </div>
         </div>
