@@ -1,4 +1,4 @@
-import { pgTable, timestamp, uuid, unique } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, uuid, unique } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { usersTable } from "./users";
@@ -12,7 +12,7 @@ export const progressTable = pgTable("progress", {
 }, (t) => [unique().on(t.userId, t.lessonId)]);
 
 export const sessionsTable = pgTable("sessions", {
-  id: uuid("id").primaryKey().defaultRandom(),
+  id: text("id").primaryKey(),
   userId: uuid("user_id").notNull().references(() => usersTable.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
