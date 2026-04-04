@@ -1,0 +1,556 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: Git Learning Platform API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication
+  - name: courses
+    description: Course management
+  - name: lessons
+    description: Lesson content
+  - name: git
+    description: Git engine execution
+  - name: progress
+    description: User progress tracking
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /auth/register:
+    post:
+      operationId: register
+      tags: [auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterBody"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginBody"
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /courses:
+    get:
+      operationId: listCourses
+      tags: [courses]
+      summary: List all courses
+      responses:
+        "200":
+          description: List of courses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CourseWithProgress"
+
+  /courses/{courseId}:
+    get:
+      operationId: getCourse
+      tags: [courses]
+      summary: Get a course with modules and lessons
+      parameters:
+        - name: courseId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Course detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /lessons/{lessonId}:
+    get:
+      operationId: getLesson
+      tags: [lessons]
+      summary: Get a lesson with its challenge
+      parameters:
+        - name: lessonId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lesson detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LessonDetail"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /git/execute:
+    post:
+      operationId: executeGitCommand
+      tags: [git]
+      summary: Execute a git command against a repo state
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GitExecuteBody"
+      responses:
+        "200":
+          description: Command result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GitExecuteResponse"
+
+  /git/validate:
+    post:
+      operationId: validateChallenge
+      tags: [git]
+      summary: Validate a challenge solution
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidateChallengeBody"
+      responses:
+        "200":
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationResult"
+
+  /progress:
+    get:
+      operationId: getProgress
+      tags: [progress]
+      summary: Get overall user progress
+      responses:
+        "200":
+          description: Progress summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProgressSummary"
+
+  /progress/lesson/{lessonId}:
+    post:
+      operationId: completeLesson
+      tags: [progress]
+      summary: Mark a lesson as complete
+      parameters:
+        - name: lessonId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Progress updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProgressSummary"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+
+    SuccessResponse:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+
+    RegisterBody:
+      type: object
+      required: [email, password, name]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+        name:
+          type: string
+
+    LoginBody:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+
+    User:
+      type: object
+      required: [id, email, name]
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+
+    AuthResponse:
+      type: object
+      required: [user]
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+
+    Course:
+      type: object
+      required: [id, title, description, level, totalLessons]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        level:
+          type: string
+          enum: [beginner, intermediate, advanced]
+        totalLessons:
+          type: integer
+        imageUrl:
+          type: string
+
+    CourseWithProgress:
+      allOf:
+        - $ref: "#/components/schemas/Course"
+        - type: object
+          properties:
+            completedLessons:
+              type: integer
+            progressPercent:
+              type: number
+
+    Module:
+      type: object
+      required: [id, courseId, title, order]
+      properties:
+        id:
+          type: string
+        courseId:
+          type: string
+        title:
+          type: string
+        order:
+          type: integer
+
+    Lesson:
+      type: object
+      required: [id, moduleId, title, order, hasPractice]
+      properties:
+        id:
+          type: string
+        moduleId:
+          type: string
+        title:
+          type: string
+        order:
+          type: integer
+        hasPractice:
+          type: boolean
+        videoUrl:
+          type: string
+        durationSeconds:
+          type: integer
+        isCompleted:
+          type: boolean
+
+    ModuleWithLessons:
+      allOf:
+        - $ref: "#/components/schemas/Module"
+        - type: object
+          required: [lessons]
+          properties:
+            lessons:
+              type: array
+              items:
+                $ref: "#/components/schemas/Lesson"
+
+    CourseDetail:
+      allOf:
+        - $ref: "#/components/schemas/CourseWithProgress"
+        - type: object
+          required: [modules]
+          properties:
+            modules:
+              type: array
+              items:
+                $ref: "#/components/schemas/ModuleWithLessons"
+
+    RepoState:
+      type: object
+      required: [branches, commits, HEAD, currentCommit]
+      properties:
+        branches:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+        commits:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/Commit"
+        HEAD:
+          type: string
+        currentCommit:
+          type: string
+        stagedFiles:
+          type: array
+          items:
+            type: string
+        workingFiles:
+          type: array
+          items:
+            type: string
+
+    Commit:
+      type: object
+      required: [id, message]
+      properties:
+        id:
+          type: string
+        message:
+          type: string
+        parent:
+          type: string
+          nullable: true
+        parents:
+          type: array
+          items:
+            type: string
+        branch:
+          type: string
+        timestamp:
+          type: string
+
+    Challenge:
+      type: object
+      required: [id, lessonId, goal, initialState]
+      properties:
+        id:
+          type: string
+        lessonId:
+          type: string
+        goal:
+          type: string
+        hints:
+          type: array
+          items:
+            type: string
+        initialState:
+          $ref: "#/components/schemas/RepoState"
+        expectedState:
+          $ref: "#/components/schemas/RepoState"
+
+    LessonDetail:
+      allOf:
+        - $ref: "#/components/schemas/Lesson"
+        - type: object
+          required: [content]
+          properties:
+            content:
+              type: string
+            challenge:
+              $ref: "#/components/schemas/Challenge"
+            nextLessonId:
+              type: string
+            prevLessonId:
+              type: string
+
+    GitExecuteBody:
+      type: object
+      required: [command, state]
+      properties:
+        command:
+          type: string
+        state:
+          $ref: "#/components/schemas/RepoState"
+
+    GitExecuteResponse:
+      type: object
+      required: [newState, output]
+      properties:
+        newState:
+          $ref: "#/components/schemas/RepoState"
+        output:
+          type: string
+        error:
+          type: string
+
+    ValidateChallengeBody:
+      type: object
+      required: [challengeId, state]
+      properties:
+        challengeId:
+          type: string
+        state:
+          $ref: "#/components/schemas/RepoState"
+
+    ValidationResult:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        details:
+          type: array
+          items:
+            type: string
+
+    ProgressSummary:
+      type: object
+      required: [totalLessons, completedLessons, progressPercent, completedLessonIds]
+      properties:
+        totalLessons:
+          type: integer
+        completedLessons:
+          type: integer
+        progressPercent:
+          type: number
+        completedLessonIds:
+          type: array
+          items:
+            type: string
+        courseProgress:
+          type: array
+          items:
+            $ref: "#/components/schemas/CourseProgressItem"
+
+    CourseProgressItem:
+      type: object
+      required: [courseId, courseTitle, completedLessons, totalLessons, progressPercent]
+      properties:
+        courseId:
+          type: string
+        courseTitle:
+          type: string
+        completedLessons:
+          type: integer
+        totalLessons:
+          type: integer
+        progressPercent:
+          type: number
