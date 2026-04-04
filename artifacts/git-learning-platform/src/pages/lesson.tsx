@@ -120,7 +120,7 @@ export default function Lesson() {
               
               {lesson.videoUrl && (
                 <div className="aspect-video bg-black rounded-lg overflow-hidden border border-border shadow-sm">
-                  <ReactPlayer url={lesson.videoUrl as string} width="100%" height="100%" controls />
+                  <ReactPlayer src={lesson.videoUrl as string} width="100%" height="100%" controls />
                 </div>
               )}
 
