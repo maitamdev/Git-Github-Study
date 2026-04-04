@@ -22,6 +22,12 @@ export default function Terminal({ onCommand }: TerminalProps) {
   const commandRef = useRef<string>('');
   const historyRef = useRef<string[]>([]);
   const historyIdxRef = useRef<number>(-1);
+  const onCommandRef = useRef(onCommand);
+
+  // Keep ref up to date
+  useEffect(() => {
+    onCommandRef.current = onCommand;
+  }, [onCommand]);
 
   useEffect(() => {
     if (!terminalRef.current) return;
@@ -67,7 +73,7 @@ export default function Terminal({ onCommand }: TerminalProps) {
             historyRef.current.push(cmd);
             historyIdxRef.current = historyRef.current.length;
             
-            const output = await onCommand(cmd);
+            const output = await onCommandRef.current(cmd);
             if (output === '__CLEAR__') {
               xterm.clear();
             } else if (output) {
@@ -140,7 +146,7 @@ export default function Terminal({ onCommand }: TerminalProps) {
       window.removeEventListener('resize', handleResize);
       xterm.dispose();
     };
-  }, [onCommand]);
+  }, []);
 
   return <div ref={terminalRef} className="absolute inset-0 p-2 bg-[#0f172a] rounded-bl-lg" />;
 }
