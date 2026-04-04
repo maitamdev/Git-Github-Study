@@ -64,6 +64,10 @@ export default function Lesson() {
       onSuccess: (res) => {
         if (res.success) {
           toast.success("🎉 Bài tập hoàn thành! Xuất sắc!");
+          // Delay to let them see the toast, then complete lesson
+          setTimeout(() => {
+            handleComplete();
+          }, 1500);
         } else {
           toast.error(res.message || "Chưa đúng, thử lại nhé!");
         }
