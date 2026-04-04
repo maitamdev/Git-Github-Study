@@ -26,25 +26,7 @@ app.use(
     },
   }),
 );
-const FRONTEND_URL = process.env.FRONTEND_URL?.replace(/\/+$/, "");
-
-const allowedOrigins = [
-  FRONTEND_URL,
-  "http://localhost:5173",
-  "http://localhost:3000",
-].filter(Boolean) as string[];
-
-app.use(cors({ 
-  origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, Postman, etc)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    // In dev, allow all
-    if (!FRONTEND_URL) return callback(null, true);
-    callback(new Error("Not allowed by CORS"));
-  },
-  credentials: true 
-}));
+app.use(cors({ origin: true, credentials: true }));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
