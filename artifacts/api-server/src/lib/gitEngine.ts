@@ -45,6 +45,14 @@ export function executeCommand(
   const parts = command.trim().split(/\s+/);
   const [cmd, sub, ...args] = parts;
 
+  // Handle direct commands like 'clear' or 'help'
+  if (cmd === "clear") {
+    return { newState: state, output: "__CLEAR__" };
+  }
+  if (cmd === "help") {
+    return executeCommand("git help", state);
+  }
+
   if (cmd !== "git") {
     return { newState: state, output: "", error: `command not found: ${cmd}` };
   }
@@ -115,9 +123,10 @@ export function executeCommand(
       }
       const currentCommits = s.branches[s.HEAD] ?? [];
       s.branches[branchName] = [...currentCommits];
-      return { newState: s, output: "" };
+      return { newState: s, output: `Đã tạo nhánh mới '${branchName}' từ '${s.HEAD}'.\nSử dụng 'git checkout ${branchName}' để chuyển sang nhánh này.` };
     }
 
+    case "switch":
     case "checkout": {
       if (args[0] === "-b") {
         const newBranch = args[1];
@@ -185,7 +194,7 @@ export function executeCommand(
       let current: string | null = s.currentCommit;
       let count = 0;
       while (current && count < 10) {
-        const commit = s.commits[current];
+        const commit: Commit = s.commits[current];
         if (!commit) break;
         lines.push(`commit ${commit.id}`);
         lines.push(`Date: ${commit.timestamp}`);
@@ -216,7 +225,8 @@ export function executeCommand(
       const file = args[0] ?? ".";
       s.stagedFiles = [...(s.stagedFiles ?? []), file];
       s.workingFiles = (s.workingFiles ?? []).filter((f) => f !== file);
-      return { newState: s, output: "" };
+      const fileName = file === "." ? "tất cả thay đổi" : `file '${file}'`;
+      return { newState: s, output: `Đã thêm ${fileName} vào staging area.\nGõ 'git status' để kiểm tra, hoặc 'git commit -m "..."' để lưu.` };
     }
 
     case "stash": {
@@ -269,22 +279,37 @@ export function executeCommand(
     case "--help": {
       return {
         newState: s,
-        output: `usage: git <command> [<args>]
+        output: `Các lệnh Git được hỗ trợ:
+  init       Khởi tạo repository
+  status     Xem trạng thái working tree
+  add        Thêm file vào staging area (vd: git add .)
+  commit     Lưu thay đổi (vd: git commit -m "messsage")
+  log        Xem lịch sử commit
+  branch     Quản lý nhánh (vd: git branch <name>)
+  checkout   Chuyển nhánh (vd: git checkout <name>)
+  switch     Chuyển nhánh (tương tự checkout)
+  merge      Gộp nhánh (vd: git merge <name>)
+  push       Đẩy code lên remote (giả lập)
+  pull       Kéo code từ remote (giả lập)
+  stash      Cất thay đổi chưa commit
+  rebase     Chuyển base của nhánh
+  reset      Quay lại commit cũ
+  tag        Gắn thẻ cho commit
 
-Common git commands:
-   init       Create an empty repository
-   commit     Record changes (-m "message")
-   branch     List, create, or delete branches
-   checkout   Switch branches (-b to create)
-   merge      Join two branches
-   log        Show commit history
-   status     Show working tree status
-   add        Add files to staging
-   stash      Stash working changes
-   rebase     Rebase commits
-   reset      Reset HEAD (--hard HEAD~1)
-   tag        Create a tag`,
+Các lệnh khác:
+  clear      Xóa màn hình terminal
+  help       Xem trợ giúp này
+`,
       };
+    }
+    
+    // Giả lập push, pull
+    case "push": {
+      return { newState: s, output: `Đang đẩy dữ liệu lên remote...\nTo https://github.com/user/repo.git\n   ${s.currentCommit.substring(0,7)}..${generateId().substring(0,7)}  ${s.HEAD} -> ${s.HEAD}` };
+    }
+    
+    case "pull": {
+      return { newState: s, output: `Đang lấy dữ liệu từ remote...\nTrạng thái: Already up to date.` };
     }
 
     default:

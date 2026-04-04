@@ -4,7 +4,7 @@ import type { RepoState } from "@workspace/api-client-react";
 import { useParams, useLocation, Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, CheckCircle2, Terminal as TerminalIcon, GitBranch as GitIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle2, Terminal as TerminalIcon, GitBranch as GitIcon, CheckSquare, Lightbulb, PlayCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -55,6 +55,8 @@ export default function Lesson() {
       return `Lỗi: ${e.message || 'Không xác định'}`;
     }
   };
+
+  const [showHint, setShowHint] = useState(false);
 
   const handleCheckSolution = () => {
     if (!lesson?.challenge || !repoState) return;
@@ -115,16 +117,23 @@ export default function Lesson() {
 
         <div className="flex-1 flex overflow-hidden">
           {/* Main Content Area */}
-          <div className="flex-1 flex flex-col overflow-y-auto">
+          <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar">
             <div className="p-8 max-w-4xl mx-auto w-full space-y-8 flex-1">
               
               {lesson.videoUrl && (
-                <div className="aspect-video bg-black rounded-lg overflow-hidden border border-border shadow-sm">
-                  <ReactPlayer src={lesson.videoUrl as string} width="100%" height="100%" controls />
+                <div className="bg-card rounded-xl overflow-hidden border border-border/50 shadow-lg mb-8">
+                  <div className="bg-muted/30 px-4 py-3 border-b border-border/50 flex items-center gap-2">
+                    <PlayCircle className="w-5 h-5 text-primary" />
+                    <span className="font-medium text-sm">Video Hướng Dẫn</span>
+                  </div>
+                  <div className="aspect-video bg-black">
+                    {/* @ts-expect-error react-player types are sometimes mismatched */}
+                    <ReactPlayer url={lesson.videoUrl as string} width="100%" height="100%" controls />
+                  </div>
                 </div>
               )}
 
-              <div className="prose prose-invert max-w-none">
+              <div className="prose prose-invert max-w-none prose-headings:text-foreground prose-a:text-primary prose-strong:text-foreground prose-code:text-primary prose-pre:bg-[#0d1117] prose-pre:border prose-pre:border-border/40">
                 <ReactMarkdown
                   components={{
                     code({node, inline, className, children, ...props}: any) {
@@ -152,9 +161,54 @@ export default function Lesson() {
 
             {/* Bottom Panel for Practice */}
             {lesson.hasPractice && repoState && (
-              <div className="h-[40vh] min-h-[300px] border-t border-border flex shrink-0 bg-card">
-                <div className="w-1/2 border-r border-border flex flex-col">
+              <div className="h-[45vh] min-h-[350px] border-t border-border flex shrink-0 bg-background shadow-2xl">
+                {/* 1. Task Panel (25%) */}
+                 <div className="w-1/4 border-r border-border flex flex-col bg-card/50">
                   <div className="h-10 border-b border-border flex items-center px-4 bg-muted/30">
+                    <CheckSquare className="w-4 h-4 mr-2 text-primary" />
+                    <span className="text-sm font-medium">Nhiệm Vụ</span>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                    {lesson.challenge ? (
+                      <div className="space-y-4">
+                        <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                          <p className="text-sm font-medium">Mục tiêu:</p>
+                          <p className="text-sm text-muted-foreground mt-1">{lesson.challenge.goal}</p>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium flex items-center justify-between">
+                            Hướng dẫn
+                            <Button variant="ghost" size="sm" className="h-6 px-2 text-xs" onClick={() => setShowHint(!showHint)}>
+                              <Lightbulb className="w-3 h-3 mr-1 text-yellow-500" />
+                              {showHint ? "Ẩn gợi ý" : "Hiện gợi ý"}
+                            </Button>
+                          </p>
+                          <ul className="space-y-2">
+                            {lesson.challenge.hints?.map((hint: string, idx: number) => (
+                              <li key={idx} className="text-sm bg-muted/40 p-2 rounded border border-border/50 text-muted-foreground">
+                                {showHint ? (
+                                  <div dangerouslySetInnerHTML={{ __html: hint.replace(/`(.*?)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-primary">$1</code>') }} />
+                                ) : (
+                                  <span className="blur-sm select-none transition-all duration-300">Nhấn hiện gợi ý để xem lệnh cần gõ nha!</span>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <Button className="w-full mt-4" size="sm" onClick={handleCheckSolution} disabled={validateChallenge.isPending}>
+                          Kiểm Tra Kết Quả
+                        </Button>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Thực hành tự do.</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. Terminal Panel (45%) */}
+                <div className="w-[45%] border-r border-border flex flex-col">
+                  <div className="h-10 border-b border-border flex items-center px-4 bg-[#0f172a] text-slate-300">
                     <TerminalIcon className="w-4 h-4 mr-2" />
                     <span className="text-sm font-medium">Terminal</span>
                   </div>
@@ -162,10 +216,12 @@ export default function Lesson() {
                     <Terminal onCommand={handleCommand} />
                   </div>
                 </div>
-                <div className="w-1/2 flex flex-col">
-                  <div className="h-10 border-b border-border flex items-center px-4 bg-muted/30">
+
+                {/* 3. Git Graph Panel (30%) */}
+                <div className="w-[30%] flex flex-col bg-slate-900">
+                  <div className="h-10 border-b border-slate-800 flex items-center px-4 bg-slate-900 text-slate-300">
                     <GitIcon className="w-4 h-4 mr-2" />
-                    <span className="text-sm font-medium">Sơ đồ Git</span>
+                    <span className="text-sm font-medium">Mô Phỏng Trực Quan</span>
                   </div>
                   <div className="flex-1 relative">
                     <GitGraph repoState={repoState} />
