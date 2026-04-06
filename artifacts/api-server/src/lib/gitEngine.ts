@@ -197,7 +197,8 @@ export function executeCommand(
         const commit: Commit = s.commits[current];
         if (!commit) break;
         lines.push(`commit ${commit.id}`);
-        lines.push(`Date: ${commit.timestamp}`);
+        lines.push(`Author: Học viên <student@git-learning>`);
+        lines.push(`Date:   ${new Date(commit.timestamp).toUTCString()}`);
         lines.push(`\n    ${commit.message}\n`);
         current = commit.parent;
         count++;
@@ -206,19 +207,22 @@ export function executeCommand(
     }
 
     case "status": {
-      const staged = (s.stagedFiles ?? []).length;
-      const working = (s.workingFiles ?? []).length;
+      const stagedFiles = s.stagedFiles ?? [];
+      const workingFiles = s.workingFiles ?? [];
       let out = `On branch ${s.HEAD}\n`;
-      if (staged > 0) {
-        out += `Changes to be committed:\n  (${staged} file(s))\n`;
+      
+      if (stagedFiles.length > 0) {
+        out += `\nChanges to be committed:\n`;
+        stagedFiles.forEach(f => out += `\tmodified:   ${f}\n`);
       }
-      if (working > 0) {
-        out += `Changes not staged for commit:\n  (${working} file(s))\n`;
+      if (workingFiles.length > 0) {
+        out += `\nChanges not staged for commit:\n`;
+        workingFiles.forEach(f => out += `\tmodified:   ${f}\n`);
       }
-      if (staged === 0 && working === 0) {
+      if (stagedFiles.length === 0 && workingFiles.length === 0) {
         out += "nothing to commit, working tree clean";
       }
-      return { newState: s, output: out };
+      return { newState: s, output: out.replace(/\t/g, "  ").trim() };
     }
 
     case "add": {
