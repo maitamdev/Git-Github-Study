@@ -424,6 +424,10 @@ components:
           type: array
           items:
             type: string
+        fileSystem:
+          type: object
+          additionalProperties:
+            type: string
 
     Commit:
       type: object
@@ -444,6 +448,10 @@ components:
           type: string
         timestamp:
           type: string
+        files:
+          type: object
+          additionalProperties:
+            type: string
 
     Challenge:
       type: object

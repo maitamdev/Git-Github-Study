@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import ReactPlayer from "react-player";
 import Terminal from "@/components/terminal";
 import GitGraph from "@/components/git-graph";
+import FileExplorer from "@/components/file-explorer";
 
 export default function Lesson() {
   const params = useParams();
@@ -166,8 +167,8 @@ export default function Lesson() {
             {/* Bottom Panel for Practice */}
             {lesson.hasPractice && repoState && (
               <div className="h-[45vh] min-h-[350px] border-t border-border flex shrink-0 bg-background shadow-2xl">
-                {/* 1. Task Panel (25%) */}
-                 <div className="w-1/4 border-r border-border flex flex-col bg-card/50">
+                {/* 1. Task Panel (20%) */}
+                 <div className="w-1/5 border-r border-border flex flex-col bg-card/50">
                   <div className="h-10 border-b border-border flex items-center px-4 bg-muted/30">
                     <CheckSquare className="w-4 h-4 mr-2 text-primary" />
                     <span className="text-sm font-medium">Nhiệm Vụ</span>
@@ -194,14 +195,14 @@ export default function Lesson() {
                                 {showHint ? (
                                   <div dangerouslySetInnerHTML={{ __html: hint.replace(/`(.*?)`/g, '<code class="bg-muted px-1.5 py-0.5 rounded text-primary">$1</code>') }} />
                                 ) : (
-                                  <span className="blur-sm select-none transition-all duration-300">Nhấn hiện gợi ý để xem lệnh cần gõ nha!</span>
+                                  <span className="blur-sm select-none transition-all duration-300">Nhấn hiện để xem lệnh nhé!</span>
                                 )}
                               </li>
                             ))}
                           </ul>
                         </div>
                         <Button className="w-full mt-4" size="sm" onClick={handleCheckSolution} disabled={validateChallenge.isPending}>
-                          Kiểm Tra Kết Quả
+                          Kiểm Tra
                         </Button>
                       </div>
                     ) : (
@@ -210,8 +211,13 @@ export default function Lesson() {
                   </div>
                 </div>
 
-                {/* 2. Terminal Panel (45%) */}
-                <div className="w-[45%] border-r border-border flex flex-col">
+                {/* 2. File Explorer Panel (20%) */}
+                <div className="w-1/5 border-r border-border flex flex-col">
+                  <FileExplorer repoState={repoState} />
+                </div>
+
+                {/* 3. Terminal Panel (40%) */}
+                <div className="w-[40%] border-r border-border flex flex-col">
                   <div className="h-10 border-b border-border flex items-center px-4 bg-[#0f172a] text-slate-300">
                     <TerminalIcon className="w-4 h-4 mr-2" />
                     <span className="text-sm font-medium">Terminal</span>
@@ -221,11 +227,11 @@ export default function Lesson() {
                   </div>
                 </div>
 
-                {/* 3. Git Graph Panel (30%) */}
-                <div className="w-[30%] flex flex-col bg-slate-900">
+                {/* 4. Git Graph Panel (20%) */}
+                <div className="w-1/5 flex flex-col bg-slate-900">
                   <div className="h-10 border-b border-slate-800 flex items-center px-4 bg-slate-900 text-slate-300">
                     <GitIcon className="w-4 h-4 mr-2" />
-                    <span className="text-sm font-medium">Mô Phỏng Trực Quan</span>
+                    <span className="text-sm font-medium">Trực Quan</span>
                   </div>
                   <div className="flex-1 relative">
                     <GitGraph repoState={repoState} />

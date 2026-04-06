@@ -6,8 +6,4 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface ValidationResult {
-  success: boolean;
-  message: string;
-  details?: string[];
-}
+export type CommitFiles = { [key: string]: string };

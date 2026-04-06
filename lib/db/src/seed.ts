@@ -534,6 +534,52 @@ Thumbs.db
       },
     ]);
 
+    // Module 2.3: Xử lý xung đột & Open Source
+    const [mod2_3] = await db.insert(modulesTable).values({
+      courseId: course2.id,
+      title: "Xử lý xung đột & Open Source",
+      order: 3,
+    }).returning();
+
+    await db.insert(lessonsTable).values([
+      {
+        moduleId: mod2_3.id,
+        title: "Merge Conflict - Kẻ thù hay Người bạn?",
+        content: `# Xử Lý Xung Đột (Merge Conflict)
+
+## Tại sao có Conflict?
+Conflict xảy ra khi 2 nhánh cùng sửa một dòng code, Git không biết chọn cái nào nên để lại các marker cảnh báo.
+
+## Cách giải quyết
+1. Mở file bị lỗi, tìm các dấu \`<<<<<<<\`, \`=======\`, \`>>>>>>>\`.
+2. Giữ lại phần đúng, xóa các dòng đánh dấu của Git.
+3. Chạy lệnh:
+\`\`\`bash
+git add file_da_sua.txt
+git commit -m "Fix merge conflict"
+\`\`\`
+`,
+        hasPractice: "false",
+        order: 1,
+      },
+      {
+        moduleId: mod2_3.id,
+        title: "Đóng góp Open Source (Fork & PR)",
+        content: `# Phân Nhánh Dự Án Bằng Fork
+
+## Fork là gì?
+Tạo một bản sao dự án của người khác về tài khoản của mình.
+
+## Đóng góp mã nguồn:
+1. Fork dự án gốc
+2. Clone repo vừa Fork về
+3. Sửa code, Push lên repo của bạn
+4. Tạo Pull Request sang repo gốc!`,
+        hasPractice: "false",
+        order: 2,
+      }
+    ]);
+
     // =============================================
     // KHÓA HỌC 3: Git Nâng Cao
     // =============================================
@@ -677,6 +723,60 @@ Revert **tạo commit mới** để đảo ngược thay đổi, **an toàn hơn
         hasPractice: "false",
         order: 3,
       },
+      {
+        moduleId: mod3_1.id,
+        title: "git cherry-pick - Lấy commit bất kì",
+        content: `# Nhặt Lấy Commit Với git cherry-pick
+
+## Công dụng
+Thêm một commit cụ thể vào nhánh hiện tại, rất tốt để lấy đúng một tính năng hoặc bản vá lỗi ở nhánh khác mà không cần merge cả nhánh.
+
+## Cú pháp
+\`\`\`bash
+git cherry-pick <commit-hash>
+\`\`\`
+`,
+        hasPractice: "false",
+        order: 4,
+      },
+      {
+        moduleId: mod3_1.id,
+        title: "git reflog - Bùa hồi sinh",
+        content: `# Khôi Phục Dữ Liệu Với git reflog
+
+## Reflog là gì?
+Git Reference Log - Lịch sử của mọi thay đổi xảy ra đối với con trỏ HEAD.
+
+## Cú pháp
+\`\`\`bash
+git reflog
+\`\`\`
+
+Bạn có thể tìm lại bất cứ thay đổi nào, kể cả những commit đã bị xóa khi thực hiện \`git reset --hard\`!
+`,
+        hasPractice: "false",
+        order: 5,
+      },
+      {
+        moduleId: mod3_1.id,
+        title: "git bisect - Truy tìm lỗi lầm",
+        content: `# Tìm Bug Cực Nhanh Bằng git bisect
+
+## Nguyên lý
+Bisect sử dụng thuật toán tìm kiếm nhị phân để duyệt qua lịch sử commit và giúp bạn cô lập xem commit nào đã làm hỏng code.
+
+## Cách chạy
+\`\`\`bash
+git bisect start
+git bisect bad         # Phiên bản hiện tại bị lỗi
+git bisect good v1.0   # Phiên bản v1.0 chắc chắn chạy tốt
+\`\`\`
+
+Sau đó Git tự động checkout các commit ở giữa, bạn chỉ việc kiểm tra và báo cáo git nó bad hay good!
+`,
+        hasPractice: "false",
+        order: 6,
+      }
     ]);
 
     console.log("🎉 Tạo dữ liệu hoàn tất!");

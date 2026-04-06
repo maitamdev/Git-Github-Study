@@ -5,6 +5,7 @@ export interface Commit {
   parents: string[];
   branch?: string;
   timestamp: string;
+  files?: Record<string, string>;
 }
 
 export interface RepoState {
@@ -14,6 +15,7 @@ export interface RepoState {
   currentCommit: string;
   stagedFiles?: string[];
   workingFiles?: string[];
+  fileSystem?: Record<string, string>;
 }
 
 function generateId(): string {
@@ -27,6 +29,7 @@ export function initRepo(): RepoState {
     parent: null,
     parents: [],
     timestamp: new Date().toISOString(),
+    files: {},
   };
   return {
     branches: { main: ["C1"] },
@@ -35,6 +38,7 @@ export function initRepo(): RepoState {
     currentCommit: "C1",
     stagedFiles: [],
     workingFiles: [],
+    fileSystem: {},
   };
 }
 
@@ -53,11 +57,64 @@ export function executeCommand(
     return executeCommand("git help", state);
   }
 
+  const s: RepoState = JSON.parse(JSON.stringify(state));
+  if (!s.fileSystem) s.fileSystem = {};
+  if (!s.workingFiles) s.workingFiles = [];
+  if (!s.stagedFiles) s.stagedFiles = [];
+
+  // Handle file system commands
+  if (cmd === "touch") {
+    const filename = args[0];
+    if (!filename) return { newState: state, output: "", error: "usage: touch <filename>" };
+    s.fileSystem[filename] = "";
+    if (!s.workingFiles.includes(filename) && !s.stagedFiles.includes(filename)) {
+      s.workingFiles.push(filename);
+    }
+    return { newState: s, output: "" };
+  }
+
+  if (cmd === "rm") {
+    const filename = args[0];
+    if (!filename) return { newState: state, output: "", error: "usage: rm <filename>" };
+    if (!(filename in s.fileSystem)) return { newState: state, output: "", error: `rm: cannot remove '${filename}': No such file or directory` };
+    delete s.fileSystem[filename];
+    if (!s.workingFiles.includes(filename)) s.workingFiles.push(filename);
+    return { newState: s, output: "" };
+  }
+
+  if (cmd === "ls") {
+    const files = Object.keys(s.fileSystem);
+    return { newState: s, output: files.join("  ") };
+  }
+
+  if (cmd === "cat") {
+    const filename = args[0];
+    if (!filename) return { newState: state, output: "", error: "usage: cat <filename>" };
+    if (!(filename in s.fileSystem)) return { newState: state, output: "", error: `cat: ${filename}: No such file or directory` };
+    return { newState: s, output: s.fileSystem[filename] };
+  }
+
+  if (cmd === "echo") {
+    const match = command.match(/^echo\s+(.*)\s+>\s+(\S+)$/);
+    if (match) {
+      const content = match[1].replace(/^["']|["']$/g, '');
+      const filename = match[2];
+      s.fileSystem[filename] = content;
+      if (!s.workingFiles.includes(filename) && !s.stagedFiles.includes(filename)) {
+        s.workingFiles.push(filename);
+      }
+      return { newState: s, output: "" };
+    }
+    const rawMatch = command.match(/^echo\s+(.*)$/);
+    if (rawMatch) {
+      return { newState: s, output: rawMatch[1].replace(/^["']|["']$/g, '') };
+    }
+    return { newState: state, output: "", error: "usage: echo \"text\" > <filename>" };
+  }
+
   if (cmd !== "git") {
     return { newState: state, output: "", error: `command not found: ${cmd}` };
   }
-
-  const s: RepoState = JSON.parse(JSON.stringify(state));
 
   switch (sub) {
     case "init": {
@@ -74,6 +131,16 @@ export function executeCommand(
         return { newState: s, output: "", error: "Aborting commit due to empty commit message." };
       }
       const id = "C" + generateId();
+      const previousCommitFiles = s.commits[s.currentCommit]?.files || {};
+      const newFiles = { ...previousCommitFiles };
+      for (const file of (s.stagedFiles || [])) {
+        if (file in s.fileSystem) {
+          newFiles[file] = s.fileSystem[file];
+        } else {
+          delete newFiles[file];
+        }
+      }
+
       const commit: Commit = {
         id,
         message,
@@ -81,6 +148,7 @@ export function executeCommand(
         parents: s.currentCommit ? [s.currentCommit] : [],
         branch: s.HEAD,
         timestamp: new Date().toISOString(),
+        files: newFiles,
       };
       s.commits[id] = commit;
       if (s.HEAD in s.branches) {
@@ -139,6 +207,7 @@ export function executeCommand(
         const currentCommits = s.branches[s.HEAD] ?? [];
         s.branches[newBranch] = [...currentCommits];
         s.HEAD = newBranch;
+        // Switching to a new branch keeps the exact same filesystem and working states
         return { newState: s, output: `Switched to a new branch '${newBranch}'` };
       }
       const target = args[0];
@@ -147,7 +216,26 @@ export function executeCommand(
       }
       s.HEAD = target;
       const commits = s.branches[target] ?? [];
-      s.currentCommit = commits[commits.length - 1] ?? "";
+      const targetCommitId = commits[commits.length - 1] ?? "";
+      
+      const targetCommitFiles = targetCommitId ? s.commits[targetCommitId]?.files || {} : {};
+      const newFs = { ...targetCommitFiles };
+      for (const w of (s.workingFiles || [])) {
+         if (w in s.fileSystem) {
+            newFs[w] = s.fileSystem[w];
+         } else {
+            delete newFs[w];
+         }
+      }
+      for (const w of (s.stagedFiles || [])) {
+         if (w in s.fileSystem) {
+            newFs[w] = s.fileSystem[w];
+         } else {
+            delete newFs[w];
+         }
+      }
+      s.fileSystem = newFs;
+      s.currentCommit = targetCommitId;
       return { newState: s, output: `Switched to branch '${target}'` };
     }
 
@@ -227,6 +315,11 @@ export function executeCommand(
 
     case "add": {
       const file = args[0] ?? ".";
+      if (file === ".") {
+        s.stagedFiles = [...new Set([...(s.stagedFiles ?? []), ...(s.workingFiles ?? [])])];
+        s.workingFiles = [];
+        return { newState: s, output: `Đã thêm tất cả thay đổi vào staging area.\nGõ 'git status' để kiểm tra, hoặc 'git commit -m "..."' để lưu.` };
+      }
       s.stagedFiles = [...(s.stagedFiles ?? []), file];
       s.workingFiles = (s.workingFiles ?? []).filter((f) => f !== file);
       const fileName = file === "." ? "tất cả thay đổi" : `file '${file}'`;

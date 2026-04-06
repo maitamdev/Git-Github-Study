@@ -23,12 +23,24 @@ router.get("/courses", async (req, res): Promise<void> => {
     .orderBy(asc(coursesTable.order));
 
   const allLessons = await db.select().from(lessonsTable);
+  const allModules = await db.select().from(modulesTable);
+
+  const moduleIdToCourseId: Record<string, string> = {};
+  for (const mod of allModules) {
+    moduleIdToCourseId[mod.id] = mod.courseId;
+  }
 
   const lessonsPerCourse: Record<string, number> = {};
+  const courseLessonsMap: Record<string, typeof allLessons> = {};
+
   for (const lesson of allLessons) {
-    const mod = await db.select().from(modulesTable).where(eq(modulesTable.id, lesson.moduleId)).limit(1);
-    if (mod[0]) {
-      lessonsPerCourse[mod[0].courseId] = (lessonsPerCourse[mod[0].courseId] ?? 0) + 1;
+    const courseId = moduleIdToCourseId[lesson.moduleId];
+    if (courseId) {
+      lessonsPerCourse[courseId] = (lessonsPerCourse[courseId] ?? 0) + 1;
+      if (!courseLessonsMap[courseId]) {
+        courseLessonsMap[courseId] = [];
+      }
+      courseLessonsMap[courseId].push(lesson);
     }
   }
 
@@ -40,12 +52,8 @@ router.get("/courses", async (req, res): Promise<void> => {
 
   const result = courses.map((c) => {
     const total = lessonsPerCourse[c.id] ?? 0;
-    const lessonIds = allLessons
-      .filter((l) => {
-        return true;
-      })
-      .map((l) => l.id);
-    const completed = allLessons
+    const courseLessons = courseLessonsMap[c.id] ?? [];
+    const completed = courseLessons
       .filter((l) => completedByLesson.has(l.id))
       .length;
 
