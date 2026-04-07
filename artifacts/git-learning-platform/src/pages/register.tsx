@@ -58,8 +58,8 @@ export default function Register() {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
         <div className="flex flex-col items-center space-y-2 text-center">
-          <div className="h-12 w-12 bg-primary/10 text-primary flex items-center justify-center rounded-xl mb-4">
-            <GitBranch className="h-6 w-6" />
+          <div className="h-12 w-12 bg-primary/10 flex items-center justify-center rounded-xl mb-4">
+            <img src="/git-icon.png" alt="Git Icon" className="h-8 w-8" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Tạo tài khoản</h1>
           <p className="text-muted-foreground text-sm">Tham gia nền tảng và chinh phục Git.</p>
