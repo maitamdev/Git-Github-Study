@@ -39,37 +39,16 @@ Dự án không chỉ cung cấp lý thuyết mà còn đặc biệt chú trọn
 
 ---
 
-## 🚀 Hướng Dẫn Cài Đặt (Installation)
+## 🚀 Bắt Đầu Học Ngay (How to Use)
 
-1. **Clone repository:**
-   \`\`\`bash
-   git clone https://github.com/maitamdev/Git-Github-Study.git
-   cd Git-Github-Study
-   \`\`\`
+Nền tảng này được thiết kế để học trực tiếp trên Trình duyệt Web của bạn, không yêu cầu bất kì công đoạn cài đặt phần mềm nào!
 
-2. **Cài đặt thư viện:**
-   Dự án sử dụng NPM Workspaces. Bạn chỉ cần chạy lệnh cài đặt định danh ở thư mục gốc:
-   \`\`\`bash
-   npm install
-   \`\`\`
+1. Truy cập vào trang chủ của nền tảng.
+2. Tạo một tài khoản học viên (Chỉ mất 5 giây).
+3. Bắt đầu với Khóa học **"Git Cơ Bản - Từ Zero Đến Hero"**.
+4. Đọc lý thuyết và gạch lệnh tương tác trực tiếp lên cửa sổ Terminal ảo bên tay phải của khóa học.
 
-3. **Cấu hình Biến Môi Trường (.env):**
-   Tạo file \`.env\` ở thư mục gốc căn cứ theo mẫu cấu hình:
-   \`\`\`env
-   DATABASE_URL="postgresql://<user>:<password>@<host>:<port>/<dbname>"
-   \`\`\`
-
-4. **Đồng bộ Database và Dữ liệu Khóa học (Seed):**
-   \`\`\`bash
-   npm run push --workspace=@workspace/db
-   npm run seed --workspace=@workspace/db
-   \`\`\`
-
-5. **Chạy Dự Án Locally:**
-   \`\`\`bash
-   npm run dev
-   \`\`\`
-   Hệ thống sẽ đồng thời khởi chạy Client (Web) tại \`http://localhost:5173\` và API Server.
+Hệ thống sẽ tự động chấm điểm và đánh dấu bài học hoàn thành cho bạn. Chúc bạn code vui!
 
 ---
 
