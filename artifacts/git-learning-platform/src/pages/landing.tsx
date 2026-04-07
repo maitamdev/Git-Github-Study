@@ -14,13 +14,8 @@ export default function Landing() {
     }
   }, [user, setLocation]);
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
+  // Removed isLoading check to ensure 0-second perceived parse time
+  // Wait silently in background and redirect later if authenticated
 
   return (
     <div className="min-h-screen bg-background flex flex-col font-sans selection:bg-primary/20">
