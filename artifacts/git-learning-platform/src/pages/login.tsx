@@ -38,7 +38,7 @@ export default function Login() {
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
-          setLocation("/");
+          setLocation("/dashboard");
         },
         onError: (error) => {
           toast({

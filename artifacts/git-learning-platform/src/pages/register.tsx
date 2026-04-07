@@ -40,7 +40,7 @@ export default function Register() {
       {
         onSuccess: () => {
           queryClient.invalidateQueries({ queryKey: getGetMeQueryKey() });
-          setLocation("/");
+          setLocation("/dashboard");
         },
         onError: (error) => {
           const message = (error as any)?.error;

@@ -38,7 +38,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6 shrink-0 z-10">
-        <Link href="/" className="flex items-center gap-2 text-primary font-bold text-xl hover:opacity-80 transition-opacity">
+        <Link href="/dashboard" className="flex items-center gap-2 text-primary font-bold text-xl hover:opacity-80 transition-opacity">
           <img src="/git-logo.png" alt="Git Logo" className="h-8" />
         </Link>
         <div className="flex items-center gap-4">

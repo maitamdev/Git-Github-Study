@@ -8,13 +8,15 @@ import Course from "@/pages/course";
 import Lesson from "@/pages/lesson";
 import Login from "@/pages/login";
 import Register from "@/pages/register";
+import Landing from "@/pages/landing";
 
 const queryClient = new QueryClient();
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
+      <Route path="/" component={Landing} />
+      <Route path="/dashboard" component={Home} />
       <Route path="/course/:courseId" component={Course} />
       <Route path="/lesson/:lessonId" component={Lesson} />
       <Route path="/login" component={Login} />
