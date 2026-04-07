@@ -4,13 +4,13 @@ import type { RepoState } from "@workspace/api-client-react";
 import { useParams, useLocation, Link } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, CheckCircle2, Terminal as TerminalIcon, GitBranch as GitIcon, CheckSquare, Lightbulb, PlayCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckCircle2, Terminal as TerminalIcon, GitBranch as GitIcon, CheckSquare, Lightbulb } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import ReactPlayer from "react-player";
+
 import Terminal from "@/components/terminal";
 import GitGraph from "@/components/git-graph";
 import FileExplorer from "@/components/file-explorer";
@@ -125,18 +125,7 @@ export default function Lesson() {
           <div className="flex-1 flex flex-col overflow-y-auto custom-scrollbar">
             <div className="p-8 max-w-4xl mx-auto w-full space-y-8 flex-1">
               
-              {lesson.videoUrl && (
-                <div className="bg-card rounded-xl overflow-hidden border border-border/50 shadow-lg mb-8">
-                  <div className="bg-muted/30 px-4 py-3 border-b border-border/50 flex items-center gap-2">
-                    <PlayCircle className="w-5 h-5 text-primary" />
-                    <span className="font-medium text-sm">Video Hướng Dẫn</span>
-                  </div>
-                  <div className="aspect-video bg-black">
-                    {/* @ts-expect-error react-player types are sometimes mismatched */}
-                    <ReactPlayer url={lesson.videoUrl as string} width="100%" height="100%" controls />
-                  </div>
-                </div>
-              )}
+
 
               <div className="prose prose-invert max-w-none prose-headings:text-foreground prose-a:text-primary prose-strong:text-foreground prose-code:text-primary prose-pre:bg-[#0d1117] prose-pre:border prose-pre:border-border/40">
                 <ReactMarkdown
